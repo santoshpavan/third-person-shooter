@@ -14,6 +14,7 @@ namespace StarterAssets
 		public bool sprint;
 		public bool aim;
 		public bool shoot;
+		public bool active = false;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -55,6 +56,12 @@ namespace StarterAssets
 		public void OnShoot(InputValue value) {
 			ShootInput(value.isPressed);
 		}
+
+		public void OnActive(InputValue value) {
+			if (value.isPressed) {
+				ActiveInput();
+			}
+		}
 #else
 	// old input sys if we do decide to have it (most likely wont)...
 #endif
@@ -88,6 +95,10 @@ namespace StarterAssets
 			shoot = newShootState;
 		}
 
+		public void ActiveInput() {
+			active = !active;
+		}
+
 #if !UNITY_IOS || !UNITY_ANDROID
 
 		private void OnApplicationFocus(bool hasFocus)
@@ -103,5 +114,5 @@ namespace StarterAssets
 #endif
 
 	}
-	
+
 }

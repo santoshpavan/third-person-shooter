@@ -5,16 +5,16 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 637665680132671718
-    m_Hash: 2741607843
+      ticks: 637670946293694616
+    m_Hash: 3355760290
   m_LockFileStatus:
     m_FilePath: C:/MyStuff/Projects/games/emo-demo/Packages/packages-lock.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 637665680132861697
-    m_Hash: 3135256371
+      ticks: 637670946293704659
+    m_Hash: 332871088
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
 m_PackageAssets:
