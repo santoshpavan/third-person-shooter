@@ -199,6 +199,13 @@ namespace StarterAssets
 			{
 				_speed = targetSpeed;
 			}
+
+			// Lower speed in case the player is active
+			// Debug.Log("_speed:" + _speed);
+			// if (_input.aim) {
+			// 	// _speed = _speed / 1.5f;
+			// }
+
 			_animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
 
 			// normalise input direction

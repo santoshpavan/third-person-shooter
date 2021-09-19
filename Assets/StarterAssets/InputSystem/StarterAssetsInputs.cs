@@ -42,23 +42,33 @@ namespace StarterAssets
 		public void OnJump(InputValue value)
 		{
 			JumpInput(value.isPressed);
+			AimInput(false);
 		}
 
 		public void OnSprint(InputValue value)
 		{
 			SprintInput(value.isPressed);
+			AimInput(false);
 		}
 
 		public void OnAim(InputValue value) {
-			AimInput(value.isPressed);
+			if (!sprint) {
+				AimInput(value.isPressed);
+			}
 		}
 
 		public void OnShoot(InputValue value) {
-			ShootInput(value.isPressed);
+			// can shoot if not sprinting
+			if (!sprint) {
+				ShootInput(value.isPressed);
+			}
 		}
 
 		public void OnActive(InputValue value) {
 			if (value.isPressed) {
+				// if (!active) {
+				// 	AimInput(false);
+				// }
 				ActiveInput();
 			}
 		}

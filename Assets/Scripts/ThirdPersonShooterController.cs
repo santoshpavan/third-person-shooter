@@ -13,16 +13,22 @@ public class ThirdPersonShooterController : MonoBehaviour {
     [SerializeField] private LayerMask aimColliderMask = new LayerMask();
     [SerializeField] private Transform bulletPrefab;
     [SerializeField] private Transform bulletSpawnPosition;
-    // [SerializeField] private Transform debugTransform;
 
     private StarterAssetsInputs starterAssetsInputs;
     private ThirdPersonController thirdPersonController;
     private Animator animator;
+    private GameObject crosshairGameObject;
+
+    private string crosshairTag = "Crosshair";
 
     private void Awake() {
         starterAssetsInputs = GetComponent<StarterAssetsInputs>();
         thirdPersonController = GetComponent<ThirdPersonController>();
         animator = GetComponent<Animator>();
+        crosshairGameObject = GameObject.FindWithTag(crosshairTag);
+        crosshairGameObject.gameObject.SetActive(false);
+        //TODO: aimCamera starts off with being set to true. Not sure why. This is a temporary fix
+        aimVirtualCamera.gameObject.SetActive(false);
     }
 
     private void Update() {
@@ -35,40 +41,58 @@ public class ThirdPersonShooterController : MonoBehaviour {
         Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
         Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
         if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimColliderMask)) {
-            // debugTransform.position = raycastHit.point;
             mouseWorldPosition = raycastHit.point;
         }
 
         if (starterAssetsInputs.active) {
             animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 1f, Time.deltaTime * 10f));
+
+            // no cross hairs or shooting while sprinting
+            if (starterAssetsInputs.sprint) {
+                crosshairGameObject.gameObject.SetActive(false);
+                if (!starterAssetsInputs.aim) {
+                    // reverting
+                    changeThirdPersonControls(false, normalSensitivity);
+                }
+            } else {
+                limitThirdPersonControlHandler(mouseWorldPosition);
+                crosshairGameObject.gameObject.SetActive(true);
+                if (starterAssetsInputs.aim) {
+                    crosshairGameObject.gameObject.SetActive(true);
+                    changeThirdPersonControls(true, aimSensitivity);
+                } else {
+                    // reverting
+                    changeThirdPersonControls(false, normalSensitivity);
+                }
+
+                if (starterAssetsInputs.shoot) {
+                    Vector3 aimDirection = (mouseWorldPosition - bulletSpawnPosition.position).normalized;
+                    Instantiate(bulletPrefab, bulletSpawnPosition.position, Quaternion.LookRotation(aimDirection, Vector3.up));
+                    starterAssetsInputs.shoot = false;
+                }
+            }
         } else {
+            // reverting
+            changeThirdPersonControls(false, normalSensitivity);
+            crosshairGameObject.gameObject.SetActive(false);
             animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 0f, Time.deltaTime * 10f));
         }
-        
-        if (starterAssetsInputs.aim) {
-            aimVirtualCamera.gameObject.SetActive(true);
-            thirdPersonController.SetSensitivity(aimSensitivity);
-            thirdPersonController.SetRotateOnMove(false);
-            // animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 1f, Time.deltaTime * 10f));
+    }
 
-            Vector3 worldAimTarget = mouseWorldPosition;
-            // y-direction as we are doing only sideways rotation
-            worldAimTarget.y = transform.position.y;
-            Vector3 aimDirection = (worldAimTarget - transform.position).normalized;
+    private void limitThirdPersonControlHandler(Vector3 mouseWorldPosition) {
+        thirdPersonController.SetRotateOnMove(false);
 
-            transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.deltaTime * 20f);
-        } else {
-            aimVirtualCamera.gameObject.SetActive(false);
-            thirdPersonController.SetSensitivity(normalSensitivity);
-            thirdPersonController.SetRotateOnMove(true);
-            // animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 0f, Time.deltaTime * 10f));
-       }
+        Vector3 worldAimTarget = mouseWorldPosition;
+        // y-direction as we are doing only sideways rotation
+        worldAimTarget.y = transform.position.y;
+        Vector3 aiDirection = (worldAimTarget - transform.position).normalized;
 
-        if (starterAssetsInputs.shoot) {
-            //TODO: Instantiate at the mouth of the gun
-            Vector3 aimDirection = (mouseWorldPosition - bulletSpawnPosition.position).normalized;
-            Instantiate(bulletPrefab, bulletSpawnPosition.position, Quaternion.LookRotation(aimDirection, Vector3.up));
-            starterAssetsInputs.shoot = false;
-        }
+        transform.forward = Vector3.Lerp(transform.forward, aiDirection, Time.deltaTime * 20f);
+    }
+
+    private void changeThirdPersonControls(bool aimState, float sensitivity) {
+        aimVirtualCamera.gameObject.SetActive(aimState);
+        thirdPersonController.SetRotateOnMove(!aimState);
+        thirdPersonController.SetSensitivity(sensitivity);
     }
 }
