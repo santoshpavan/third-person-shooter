@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BulletController : MonoBehaviour {
-    private float speed = 50.0f;
+    private float speed = 100.0f;
 
     private Rigidbody bulletRigidBody;
 

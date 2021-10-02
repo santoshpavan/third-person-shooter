@@ -6,6 +6,7 @@ TagManager:
   tags:
   - CinemachineTarget
   - Crosshair
+  - Bullet
   layers:
   - Default
   - TransparentFX
